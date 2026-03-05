@@ -42,7 +42,6 @@ Create this exact structure:
 │   └── <cli_command>/
 │       └── SKILL.md
 ├── .gitignore
-├── CHANGELOG.md
 ├── LICENSE
 ├── pyproject.toml
 └── README.md
@@ -72,7 +71,7 @@ Execute steps in order.
    - `pytest>=8.0.0`
 6. Set CLI entrypoint:
    - `[project.scripts]`
-   - `<cli_command> = "<package_name>.cli:app"`
+   - `<cli_command> = "<package_name>.cli:main"`
 7. Set setuptools configuration:
    - `[tool.setuptools]`
    - `package-dir = {"" = "src"}`
@@ -249,7 +248,7 @@ Mark complete only when all are true:
 1. project structure matches target structure (including `core.py`)
 2. `core.py` has pure business logic with no CLI dependencies (2+ functions)
 3. `cli.py` uses Typer decorators with `@app.command()` (2+ commands)
-4. CLI entrypoint `app` is exposed at module level in `cli.py`
+4. CLI entrypoint `main` is exposed at module level in `cli.py` and handles exceptions
 5. CLI entrypoint works after editable install (`pip install -e .`)
 6. module execution works (`python -m <package_name>`)
 7. all tests pass (`pytest` returns 0)

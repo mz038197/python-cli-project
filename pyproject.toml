@@ -18,7 +18,7 @@ dependencies = [
 keywords = ["cli", "demo", "tool"]
 
 [project.scripts]
-demo-cli = "demo_cli.cli:app"
+demo-cli = "demo_cli.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
