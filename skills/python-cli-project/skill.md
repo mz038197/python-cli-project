@@ -1,259 +1,200 @@
 ---
-name: python-cli-project-builder
-description: Build a production-ready Python CLI project scaffold with Typer, setuptools, pytest, packaging metadata, and release workflow. Use when an agent needs to create or regenerate a pip/uv-installable CLI tool repository from scratch.
+name: python-cli-project-clone-setup
+description: Clone python-cli-project from GitHub, customize it with user parameters, remove git remotes, and validate that all tests pass. Use this when an agent needs to create a new customized Python CLI project based on the template.
 ---
 
-# Python CLI Project Builder
+# Python CLI Project Clone & Setup
 
-Create a reusable Python CLI project with clean layering, tests, and packaging based on Typer and setuptools.
+複製 python-cli-project 範本，自訂參數，並完成初始化設定。
 
-## Inputs
+## 📋 Required Input Parameters
 
-Require these values before execution:
+先請 user 提供以下 6 個參數：
 
-1. `project_name` (example: `cli-tool-test`)
-2. `package_name` (example: `cli_tool_test`)
-3. `cli_command` (example: `cli-tool-test`)
-4. `python_min_version` (default: `3.13`)
-5. `author_name`
-6. `author_email`
+1. **`project_name`** (example: `my-cli-tool`)
+   - 專案資料夾名稱，使用 kebab-case
 
-If any required value is missing, stop and request it.
+2. **`package_name`** (example: `my_cli_tool`)
+   - Python 套件名稱，使用 snake_case
 
-**Location**: Create project at `{workspace_root}/{project_name}/`
+3. **`cli_command`** (example: `my-cli`)
+   - 終端命令名稱，使用 kebab-case
 
-## Target Structure
+4. **`python_min_version`** (default: `3.13`)
+   - 格式：`3.8`, `3.10`, `3.13` 等
 
-Create this exact structure:
+5. **`author_name`** (example: `John Doe`)
+   - 作者名稱
 
-```text
-<project_name>/
-├── src/
-│   └── <package_name>/
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── core.py
-│       └── cli.py
-├── tests/
-│   ├── __init__.py
-│   ├── test_core.py
-│   └── test_cli.py
-├── skills/
-│   └── <cli_command>/
-│       └── SKILL.md
-├── .gitignore
-├── LICENSE
-├── pyproject.toml
-└── README.md
+6. **`author_email`** (example: `john@example.com`)
+   - 作者電子郵件
+
+**Stop and request if any parameter is missing.**
+
+## Workflow
+
+Execute these 12 steps in order. Stop and report if any step fails.
+
+### Step 1: Validate Input Parameters
+
+Verify all parameters before proceeding:
+
+- `package_name`: lowercase letters, numbers, underscores only (no hyphens)
+- `cli_command`: lowercase letters, numbers, hyphens only (no underscores)
+- `project_name`: kebab-case format
+- `python_min_version`: format `X.Y` (e.g., `3.8`)
+
+### Step 2: Clone Repository
+
+```bash
+git clone https://github.com/mz038197/python-cli-project.git {project_name}
 ```
 
-## Build Workflow
+Replace `{project_name}` with user-provided value.
 
-Execute steps in order.
+### Step 3: Remove Git Remote
 
-### 1. Initialize Repository Files
-
-1. Create project root directory: `{workspace_root}/{project_name}/`
-2. Create directories `src/<package_name>` and `tests`.
-3. Create `__init__.py` with `__version__ = "0.1.0"` and import `core`.
-4. Create `__main__.py` as module execution entry point.
-5. Create `.gitignore` for Python, venv, cache, coverage, build artifacts, `*.egg-info`.
-6. Create `skills/<cli_command>/` directory with skill documentation.
-
-### 2. Configure Packaging (`pyproject.toml`)
-
-1. Set build backend to `setuptools.build_meta`.
-2. Fill `[project]` fields using input values.
-3. Set Python minimum version (e.g., `>=3.8`).
-4. Add runtime dependencies:
-   - `typer>=0.12.0`
-5. Add dev dependencies:
-   - `pytest>=8.0.0`
-6. Set CLI entrypoint:
-   - `[project.scripts]`
-   - `<cli_command> = "<package_name>.cli:main"`
-7. Set setuptools configuration:
-   - `[tool.setuptools]`
-   - `package-dir = {"" = "src"}`
-   - `[tool.setuptools.packages]`
-   - `find = {where = ["src"]}`
-
-### 3. Implement Core Layer (`core.py`)
-
-Create pure business logic layer with NO CLI dependencies:
-
-1. Implement business logic functions (e.g., `greet()`, `add_numbers()`).
-2. Keep functions independent from `typer`, `print()`, or `sys.exit()`.
-3. Add comprehensive docstrings with Args and Returns.
-4. Focus on reusability - these functions should be usable outside CLI context.
-
-Minimum sample functions:
-
-1. `greet(name: str = "World") -> str` - greeting function
-2. `add_numbers(nums: List[float]) -> float` - arithmetic operation
-
-### 4. Implement CLI Layer (`cli.py`)
-
-CLI layer handles user interaction using Typer decorators:
-
-1. Import Typer: `import typer`
-2. Import `core` module: `from . import core`
-3. Create Typer app: `app = typer.Typer(name="...", help="...")`
-4. Define commands using `@app.command()` decorator.
-5. Use `typer.Argument()` and `typer.Option()` for parameters.
-6. Use `typer.echo()` for output instead of `print()`.
-7. Keep all I/O and error handling in this layer only.
-
-Example command:
-
-```python
-@app.command()
-def hello(
-    name: str = typer.Argument("World", help="Name to greet"),
-) -> None:
-    """Greet a user"""
-    result = core.greet(name)
-    typer.echo(result)
+```bash
+cd {project_name}
+git remote remove origin
+git remote -v  # Verify empty
 ```
 
-**Advantages**:
-- Automatic help generation with `--help`
-- Type hints directly define CLI parameters
-- Less boilerplate than argparse
-- Rich output support built-in
-- Shell completion support
+### Step 4: Rename Package Directory
 
-### 5. Implement `__main__.py`
-
-Create module execution entry point:
-
-```python
-import sys
-from .cli import app
-
-if __name__ == "__main__":
-    app()
+```bash
+mv src/demo_cli src/{package_name}
 ```
 
-Or with exit code handling:
+### Step 5: Update Python Files in src/{package_name}/
 
-```python
-import sys
-from .cli import main
+Update these 4 files with new `package_name`:
 
-if __name__ == "__main__":
-    sys.exit(main())
+1. `__init__.py` - Change docstring, keep `__version__` and imports
+2. `__main__.py` - Change docstring only
+3. `cli.py` - Change docstring and update:
+   ```python
+   app = typer.Typer(
+       name="{cli_command}",
+       help="簡單的 Python CLI 工具示範",
+   )
+   ```
+4. `core.py` - Change docstring only
+
+### Step 6: Update Test Files
+
+1. `tests/test_core.py`:
+   - Change docstring
+   - Update import: `from {package_name} import core`
+
+2. `tests/test_cli.py`:
+   - Change docstring
+   - Update import: `from {package_name}.cli import app, main`
+
+### Step 7: Update pyproject.toml
+
+Update `[project]` section:
+```toml
+name = "{project_name}"
+authors = [{name = "{author_name}", email = "{author_email}"}]
+requires-python = ">={python_min_version}"
 ```
 
-### 6. Implement Tests
-
-Separate tests into two files for clear separation of concerns:
-
-**`tests/test_core.py`** - Test pure business logic:
-
-1. Test each core function with various inputs.
-2. No dependencies on CLI or I/O.
-3. Cover edge cases: empty lists, negative numbers, zero, floats, etc.
-4. Use simple assertions without mocking.
-
-Example test class:
-
-```python
-class TestGreet:
-    def test_greet_default(self):
-        assert core.greet() == "你好，World！..."
-    
-    def test_greet_with_name(self):
-        assert core.greet("Alice") == "你好，Alice！..."
+Update `[project.scripts]`:
+```toml
+{cli_command} = "{package_name}.cli:main"
 ```
 
-**`tests/test_cli.py`** - Test CLI interface using Typer CliRunner:
+### Step 8: Update README.md
 
-1. Import `CliRunner` from `typer.testing`.
-2. Create runner instance: `runner = CliRunner()`
-3. Test commands: `result = runner.invoke(app, ["command", "arg"])`
-4. Check exit code: `assert result.exit_code == 0`
-5. Check output: `assert "expected text" in result.stdout`
+Replace all `demo-cli` with `{cli_command}`:
+- Title: `# {project_name}`
+- Usage examples
+- Skill add command (if GitHub username provided)
 
-Example test:
+### Step 9: Remove Skills Folder
 
-```python
-from typer.testing import CliRunner
-from demo_cli.cli import app
-
-runner = CliRunner()
-
-def test_hello_command():
-    result = runner.invoke(app, ["hello", "Alice"])
-    assert result.exit_code == 0
-    assert "你好，Alice" in result.stdout
+```bash
+rm -r skills
 ```
 
-### 7. Create Skill Documentation
+### Step 10: Install Project
 
-Create `skills/<cli_command>/SKILL.md`:
+```bash
+pip install -e .
+```
 
-1. Document the CLI tool purpose and features.
-2. Include usage examples for all commands.
-3. Explain command arguments and options.
-4. Provide integration guidance for Claude Code Agent.
-5. Document the `core` module functions if meant for programmatic use.
+or with uv:
 
-### 8. Write README
+```bash
+uv pip install -e .
+```
 
-Include:
+### Step 11: Run Tests
 
-1. install via `pip` (editable: `pip install -e .` and global: `pip install .`)
-2. install via `uv` (parallel commands)
-3. usage examples for all commands
-4. development setup
-5. test command (`pytest` or `uv run pytest`)
-6. release workflow
-7. project structure explanation (core vs CLI separation)
+```bash
+pytest
+```
 
-### 9. Validate
+Verify all tests pass (exit code 0).
 
-Run and pass:
+### Step 12: Verify CLI Commands
 
-1. `<cli_command> --help` - verify help text is auto-generated
-2. `<cli_command> <command> --help` - verify command-specific help
-3. `python -m <package_name> --help` - module execution
-4. `pytest` (or `uv run pytest`) - all tests must pass
-5. `pip install -e .` - editable install works
-6. All command examples from README work correctly
+Test each command works:
 
-If any command fails, fix files and rerun until all pass.
+```bash
+{cli_command} --help
+{cli_command} hello World
+{cli_command} add 10 5
+```
 
-## Rules
+### Step 13: Commit Initial State
 
-1. **Separate concerns**: Pure business logic in `core.py`, CLI handling in `cli.py`.
-2. **Use Typer** with `@app.command()` decorators for modern CLI definition.
-3. **No I/O in core**: Core functions must not use `typer.echo()`, `input()`, or `sys.exit()`.
-4. **Testability first**: Write core functions so they're easy to test without mocking.
-5. **Add `__main__.py`** for module execution (`python -m <package_name>`).
-6. **Test both layers**: Separate `test_core.py` and `test_cli.py`.
-7. **Use CliRunner** from `typer.testing` for CLI testing.
-8. **Use setuptools** with `src/` layout for packaging.
-9. **Keep it minimal**: Start with 1-2 commands and 1-2 core functions.
-10. **Update `README.md`** when command interface changes.
-11. **Bump version** in both `__init__.py` and `pyproject.toml` before release.
-12. **Update `CHANGELOG.md`** for each release.
-13. **Support both** `pip install` and `uv pip install`.
-14. **Add `*.egg-info`** to `.gitignore` (auto-generated, not version controlled).
+```bash
+git add .
+git commit -m "Initial project setup from template"
+```
 
-## Definition of Done
+## ✅ Validation Checklist
 
-Mark complete only when all are true:
+Mark complete only when ALL are true:
 
-1. project structure matches target structure (including `core.py`)
-2. `core.py` has pure business logic with no CLI dependencies (2+ functions)
-3. `cli.py` uses Typer decorators with `@app.command()` (2+ commands)
-4. CLI entrypoint `main` is exposed at module level in `cli.py` and handles exceptions
-5. CLI entrypoint works after editable install (`pip install -e .`)
-6. module execution works (`python -m <package_name>`)
-7. all tests pass (`pytest` returns 0)
-8. `test_core.py` has 5+ core function tests
-9. `test_cli.py` uses `CliRunner` from `typer.testing` (4+ tests)
-10. `--help` output is auto-generated and readable
-11. README examples match actual command behavior
-12. skill documentation is accurate and complete
+- [ ] All 6 parameters provided and validated
+- [ ] Project cloned successfully
+- [ ] Git remote removed
+- [ ] Package directory renamed
+- [ ] All src files updated
+- [ ] All test files updated
+- [ ] pyproject.toml configured correctly
+- [ ] README.md updated
+- [ ] skills/ folder deleted
+- [ ] Project installed without errors
+- [ ] All pytest tests pass
+- [ ] CLI commands work (`--help`, `hello`, `add`)
+- [ ] Initial git commit created
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Git clone fails | Verify internet connection and GitHub URL |
+| Import errors | Check all 4 Python files in `src/{package_name}/` have correct imports |
+| Tests fail | Ensure `pyproject.toml` CLI entrypoint is `{package_name}.cli:main` |
+| Command not found | Run `pip install -e .` again |
+| Permission denied | Use `rm -rf skills/` with elevated permissions if needed |
+
+## Post-Setup
+
+After successful setup, user can:
+
+1. Add remote and push to their repository:
+   ```bash
+   git remote add origin https://github.com/{username}/{project_name}.git
+   git push -u origin main
+   ```
+
+2. Start developing CLI commands in `src/{package_name}/cli.py`
+
+3. Add business logic in `src/{package_name}/core.py`
+
+4. Add tests following existing patterns in `tests/`
