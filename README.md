@@ -19,7 +19,7 @@ pip install .
 或從 GitHub 直接安裝：
 
 ```bash
-pip install git+https://github.com/username/python-cli-project.git
+pip install git+https://github.com/mz038197/python-cli-project.git
 ```
 
 ## 使用方式
@@ -51,7 +51,7 @@ demo-cli add 10 5 3
 
 3. **添加 Skill 到 Claude Code Agent**
    ```bash
-   npx skills add username/python-cli-project
+   npx skills add mz038197/python-cli-project
    ```
 
 ## 項目結構
@@ -83,7 +83,7 @@ python-cli-project/
 你可以通過以下命令將此 Skill 添加到 Claude Code Agent：
 
 ```bash
-npx skills add username/python-cli-project
+npx skills add mz038197/python-cli-project
 ```
 
 ## 測試
