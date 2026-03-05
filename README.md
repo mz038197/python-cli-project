@@ -19,7 +19,7 @@ pip install .
 或從 GitHub 直接安裝：
 
 ```bash
-pip install git+https://github.com/username/python-cli-project.git
+pip install git+https://github.com/mz038197/python-cli-project.git
 ```
 
 ## 使用方式
