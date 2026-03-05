@@ -118,19 +118,43 @@ Replace all `demo-cli` with `{cli_command}`:
 rm -r skills
 ```
 
-### Step 10: Install Project
+### Step 10: Create and Activate Virtual Environment
+
+Create a virtual environment first:
 
 ```bash
-pip install -e .
+python -m venv venv
 ```
 
-or with uv:
+Activate it:
+
+```bash
+# On Windows
+venv\Scripts\activate
+
+# On macOS/Linux
+source venv/bin/activate
+```
+
+### Step 11: Install Project
+
+Inside the activated virtual environment:
+
+with uv:
 
 ```bash
 uv pip install -e .
 ```
 
-### Step 11: Run Tests
+or pip:
+
+```bash
+pip install -e .
+```
+
+### Step 12: Run Tests
+
+Inside the activated virtual environment:
 
 ```bash
 pytest
@@ -138,9 +162,9 @@ pytest
 
 Verify all tests pass (exit code 0).
 
-### Step 12: Verify CLI Commands
+### Step 13: Verify CLI Commands
 
-Test each command works:
+Test each command works (still in venv):
 
 ```bash
 {cli_command} --help
@@ -148,7 +172,7 @@ Test each command works:
 {cli_command} add 10 5
 ```
 
-### Step 13: Commit Initial State
+### Step 14: Commit Initial State
 
 ```bash
 git add .
@@ -168,9 +192,10 @@ Mark complete only when ALL are true:
 - [ ] pyproject.toml configured correctly
 - [ ] README.md updated
 - [ ] skills/ folder deleted
-- [ ] Project installed without errors
-- [ ] All pytest tests pass
-- [ ] CLI commands work (`--help`, `hello`, `add`)
+- [ ] Virtual environment created and activated
+- [ ] Project installed without errors (in venv)
+- [ ] All pytest tests pass (in venv)
+- [ ] CLI commands work (`--help`, `hello`, `add` in venv)
 - [ ] Initial git commit created
 
 ## Troubleshooting
@@ -180,8 +205,9 @@ Mark complete only when ALL are true:
 | Git clone fails | Verify internet connection and GitHub URL |
 | Import errors | Check all 4 Python files in `src/{package_name}/` have correct imports |
 | Tests fail | Ensure `pyproject.toml` CLI entrypoint is `{package_name}.cli:main` |
-| Command not found | Run `pip install -e .` again |
+| Command not found | Make sure virtual environment is activated (use `source venv/bin/activate` or `venv\Scripts\activate`) |
 | Permission denied | Use `rm -rf skills/` with elevated permissions if needed |
+| Module not found after install | Verify `pip install -e .` ran successfully inside the activated venv |
 
 ## Post-Setup
 
