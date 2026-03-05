@@ -123,7 +123,7 @@ rm -r skills
 Create a virtual environment first:
 
 ```bash
-python -m venv venv
+py -m venv venv
 ```
 
 Activate it:
