@@ -1,6 +1,7 @@
-"""允許透過 python -m demo_cli 執行模組"""
+"""demo-cli 模組執行入口"""
 
+import sys
 from .cli import main
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

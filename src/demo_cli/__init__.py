@@ -1,9 +1,7 @@
-"""demo-cli 套件"""
+"""demo-cli 套件初始化"""
 
 __version__ = "0.1.0"
-__author__ = "Your Name"
-__license__ = "MIT"
 
-from .cli import main
+from . import core
 
-__all__ = ["main"]
+__all__ = ["core", "__version__"]
